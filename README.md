@@ -1,1 +1,3 @@
-# solutions for computer graphics lecture
+# computer graphics course
+   
+  answers for CG labs.
