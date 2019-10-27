@@ -39,25 +39,27 @@ playgorund.add(line);
 
 // 3- add the cushions
 // first cushion
+var collidableMeshList = [];
 const playGroundWidth = 3.8;
 const playGroundHeight = 7.8;
 // the distance between the ball radious and the cushion, which is basically the ball radious
-const collisonThreshold = 0.3;
-const cushion1Geo = new THREE.BoxGeometry( 0.2, 16, 1 );
+const ballRadious = 0.3;
+const cushionWidth = 0.2;
+const cushion1Geo = new THREE.BoxGeometry( cushionWidth, 16, 1 );
 const cushion1Mat = new THREE.MeshBasicMaterial( {color: "#006400"} );
 const cushion1 = new THREE.Mesh( cushion1Geo, cushion1Mat );
 cushion1.position.set(-3.9,0,0.5);
 playgorund.add(cushion1);
 
 // second cushion
-const cushion2Geo = new THREE.BoxGeometry( 0.2, 16, 1 );
+const cushion2Geo = new THREE.BoxGeometry( cushionWidth, 16, 1 );
 const cushion2Mat = new THREE.MeshBasicMaterial( {color: "#006400"} );
 const cushion2 = new THREE.Mesh( cushion2Geo, cushion2Mat );
 cushion2.position.set(3.9,0,0.5);
 playgorund.add(cushion2);
 
 // 4- cushion for singleMode
-const cushionSMGeo = new THREE.BoxGeometry( 0.2, 7.8, 1 );
+const cushionSMGeo = new THREE.BoxGeometry( cushionWidth, 7.8, 1 );
 const cushionSMMat = new THREE.MeshBasicMaterial( {color: "#006400"} );
 const cushionSM = new THREE.Mesh( cushionSMGeo, cushionSMMat );
 cushionSM.rotation.z = -Math.PI/2;
@@ -65,23 +67,24 @@ cushionSM.position.set(0,7.9,0.5);
 playgorund.add(cushionSM);
 
 
-const cushionDMGeo = new THREE.BoxGeometry( 0.2, 7.8, 1 );
+const cushionDMGeo = new THREE.BoxGeometry( cushionWidth, 7.8, 1 );
 const cushionDMMat = new THREE.MeshBasicMaterial( {color: "#006400"} );
 const cushionDM = new THREE.Mesh( cushionDMGeo, cushionDMMat );
 cushionDM.rotation.z = -Math.PI/2;
 cushionDM.position.set(0,-7.9,0.5);
-playgorund.add(cushionDM);
+// playgorund.add(cushionDM);
 
 // 5- box for player 1
-const player1Geo = new THREE.BoxGeometry( 0.2, 1.5, 1 );
+const playerHeight = 1.5;
+const player1Geo = new THREE.BoxGeometry( cushionWidth, playerHeight, 1 );
 const player1Mat = new THREE.MeshBasicMaterial( {color: "red"} );
 const player1 = new THREE.Mesh( player1Geo, player1Mat );
 player1.rotation.z = -Math.PI/2;
 player1.position.set(0,-7.9,0.5);
-// playgorund.add(player1);
+playgorund.add(player1);
 
 // 6- add player 2
-const player2Geo = new THREE.BoxGeometry( 0.2, 1.5, 1 );
+const player2Geo = new THREE.BoxGeometry( cushionWidth, playerHeight, 1 );
 const player2Mat = new THREE.MeshBasicMaterial( {color: "blue"} );
 const player2 = new THREE.Mesh( player2Geo, player2Mat );
 player2.rotation.z = -Math.PI/2;
@@ -89,11 +92,11 @@ player2.position.set(0,7.9,0.5);
 // playgorund.add(player2);
 
 // add the ball
-const ballGeo = new THREE.SphereGeometry( 0.3, 16,16);
+const ballGeo = new THREE.SphereGeometry(ballRadious, 16,16);
 const ballMat = new THREE.MeshBasicMaterial({color: "yellow",
                                          wireframe:false} );
 const ball = new THREE.Mesh(ballGeo, ballMat);
-ball.position.z = 0.3;
+ball.position.z = ballRadious;
 scene.add(ball);
 let speed = 0.06;
 // let speed = 1;
@@ -106,52 +109,84 @@ const movePlayerOne = function(event) {
   event.preventDefault();
   const leftKeystroke = 37;
   const rightKeystroke = 39;
-  console.log(player1.position.x);
   if(event.keyCode === rightKeystroke) {
     // edit
     if(player1.position.x < (playGroundWidth -1) ){
-      player1.position.x += 0.25;
+      player1.position.x += 0.5;
     }
   }
   if(event.keyCode === leftKeystroke) {
     if(player1.position.x > -(playGroundWidth -1) )
-      player1.position.x -= 0.25;
+      player1.position.x -= 0.5;
     }
 };
 
-var direction = {x: -1, y: -1, z: 0};
+let direction = {x: 2, y: 2, z: 0};
 const detectCollision  = function() {
-  if((playGroundHeight - Math.abs(ball.position.y)) < collisonThreshold  ) {
-    direction = reflect1('y');
-    // direction = reflect(ball.position, new THREE.Vector3(0,ball.position.y,0));
-
-  } else if((playGroundWidth - Math.abs(ball.position.x)) < collisonThreshold) {
-    // direction = reflect(ball.position, new THREE.Vector3(ball.position.x,0,0));
-    direction = reflect1('x');
+  // console.log("player: " + player1.position);
+  // console.log("ball: " + ball.position);
+  let d = player1.position.distanceToSquared(ball.position);
+  if((playGroundHeight - ball.position.y ) < ballRadious  ) {
+      direction = reflect('y');
+  } else if((playGroundHeight + ball.position.y ) < ballRadious  ) {
+      reflectCorrespondingly();
+        // if ((Math.abs(ball.position.x) - (Math.abs(player1.position.x)+ 0.3) ) < collisonThreshold )
+        //     direction = reflect('y');
+  } else if((playGroundWidth - Math.abs(ball.position.x)) < ballRadious) {
+      direction = reflect('x');
   }
 }
 
+// the goal is to detect the position of the player1 to the right or the left of the ball
+collidableMeshList.push(player1);
+collidableMeshList.push(ball);
+const reflectCorrespondingly = function() {
+    // to the left of the ball
+    for (var vertexIndex = 0; vertexIndex < ball.geometry.vertices.length; vertexIndex++)
+    {
+        var localVertex = ball.geometry.vertices[vertexIndex].clone();
+        var globalVertex = localVertex.applyMatrix4(ball.matrix);
+        var directionVector = globalVertex.sub( ball.position );
+
+        var ray = new THREE.Raycaster( player1.position, directionVector.clone().normalize() );
+        var collisionResults = ray.intersectObjects( collidableMeshList );
+        if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() )
+        {
+          console.log("hit");
+          reflect('y');
+          break;
+        }
+    }
+    // const ball_x = ball.position.x;
+    // const player1_x = player1.position.x;
+    // if ( ball_x > player1_x ) {
+    //   if (Math.abs((ball_x - ballRadious) - (player1_x + playerHeight/2)) < 0.3 )
+    //     reflect('y');
+    // }
+    // // to the right of the ball
+    // else {
+    //   if (Math.abs((ball_x + ballRadious) - (player1_x - playerHeight/2)) < 0.3 )
+    //     reflect('y');
+    // }
+}
 
 const moveBall = function(h) {
     ball.position.x += speed * direction.x;
     ball.position.y += speed * direction.y;
 }
 
-const reflect = function(vin, n) {
-  const n2 = n.clone();
-  n2.normalize();
-  let ret = vin.clone();
-  const f = 2 * n2.dot(vin);
-  ret.sub(n2.multiplyScalar(f));
-  return ret;
-}
+// const reflect = function(vin, n) {
+//   const n2 = n.clone();
+//   n2.normalize();
+//   let ret = vin.clone();
+//   const f = 2 * n2.dot(vin);
+//   ret.sub(n2.multiplyScalar(f));
+//   return ret;
+// }
 
-const reflect1 = function(d){
-  if(d === 'x'){
-    direction.x = -1 * direction.x;
-  } else {
-    direction.y = -1 * direction.y;
-  }
+const reflect = function(side) {
+  (side === 'x') ? direction.x = -1 * direction.x :
+                   direction.y = -1 * direction.y;
   return direction;
 
 }
