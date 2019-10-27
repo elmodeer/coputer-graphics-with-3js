@@ -137,9 +137,9 @@ const y_component = num *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
 let direction = {x: x_component, y: y_component, z: 0};
 const detectCollision  = function() {
   if ((playGroundHeight/2 - ball.position.y ) < ballRadious) {
-      (doubleMode) ?  anotherReflect(player2) : reflect('y');
+      (doubleMode) ?  refelctPlayer(player2) : reflect('y');
   } else if((playGroundHeight/2 + ball.position.y ) < ballRadious  ) {
-      anotherReflect(player1)
+      refelctPlayer(player1)
   } else if((playGroundWidth/2 - Math.abs(ball.position.x)) < ballRadious) {
       direction = reflect('x');
   }
@@ -153,9 +153,8 @@ collidableMeshListP1.push(ball);
 
 
 const refelctPlayer = function(player) {
-  const ball_x = ball.position.x;
-  const player_x = player.position.x;
-  if(Math.abs(ball_x - player_x) < 1) {
+  const hittingThreshold = playerHeight/2 + ballRadious;
+  if(Math.abs(ball.position.x - player.position.x) < hittingThreshold ) {
     reflect('y');
   }
 }
@@ -163,13 +162,6 @@ const refelctPlayer = function(player) {
 const moveBall = function() {
     ball.position.x += speed * direction.x;
     ball.position.y += speed * direction.y;
-}
-
-// function to wait in order to hopefull improve the detection mechanism
-const sleep = function(ms) {
-   var currentTime = new Date().getTime();
-   while (currentTime + ms >= new Date().getTime()) {
-   }
 }
 
 const reflect = function(side) {
@@ -193,7 +185,6 @@ const doubleModeActiviate = function() {
     singleMode = false;
     playgorund.add(player2);
     playgorund.remove(cushionSM);
-
 }
 
 playgorund.add(plane);
