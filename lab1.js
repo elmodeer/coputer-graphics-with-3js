@@ -173,12 +173,17 @@ const refelctPlayer = function(player) {
     reflect('y');
   } else {
     gameOver = true;
-    if(doubleMode)
+    let textDiv = document.getElementById("winingDiv");
+    textDiv.textContent = "GameOver !!! ";
+    if(doubleMode) {
       if (ball.position.y > 0) {
-        alert("player1 wins") ;
+        textDiv.textContent += "player One wins";
+        textDiv.style.color = 'red';
       } else {
-        alert("player2 wins");
+        textDiv.textContent += "player Two wins";
+        textDiv.style.color = 'blue';
       }
+    }
   }
 }
 
