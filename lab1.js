@@ -135,19 +135,10 @@ let num = Math.floor(Math.random() * 3) + 1;
 const x_component = num *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
 const y_component = num *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
 let direction = {x: x_component, y: y_component, z: 0};
-// the ball has to refelct at each player sider exactly once at a time
-// and can not reflect two times in a row on the same side
-let hitPlayer1 = false;
 const detectCollision  = function() {
-  // console.log("player: " + player1.position);
-  // console.log("ball: " + ball.position);
-  // let d = player1.position.distanceToSquared(ball.position);
   if ((playGroundHeight/2 - ball.position.y ) < ballRadious) {
-      // (doubleMode) ?  reflectPlayer(player2,collidableMeshListP2, !hitPlayer1) : reflect('y');
       (doubleMode) ?  anotherReflect(player2) : reflect('y');
   } else if((playGroundHeight/2 + ball.position.y ) < ballRadious  ) {
-      // direction = reflect('y');
-      // reflectPlayer(player1, collidableMeshListP1, hitPlayer1);
       anotherReflect(player1)
   } else if((playGroundWidth/2 - Math.abs(ball.position.x)) < ballRadious) {
       direction = reflect('x');
@@ -160,27 +151,8 @@ collidableMeshListP2.push(ball)
 collidableMeshListP1.push(player1);
 collidableMeshListP1.push(ball);
 
-const reflectPlayer = function(player, collidableList, boolVal) {
-  if(!boolVal) {
-    for (var vertexIndex = 0; vertexIndex < ball.geometry.vertices.length; vertexIndex++) {
-        var localVertex = ball.geometry.vertices[vertexIndex].clone();
-        var globalVertex = localVertex.applyMatrix4(ball.matrix);
-        var directionVector = globalVertex.sub( ball.position );
 
-        var ray = new THREE.Raycaster( player.position, directionVector.clone().normalize() );
-        var collisionResults = ray.intersectObjects( collidableList );
-        if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length()) {
-          console.log("hit");
-          reflect('y');
-          console.log("reflected");
-          hitPlayer1 = true;
-          break;
-        }
-    }
-  }
-}
-
-const anotherReflect = function(player) {
+const refelctPlayer = function(player) {
   const ball_x = ball.position.x;
   const player_x = player.position.x;
   if(Math.abs(ball_x - player_x) < 1) {
@@ -192,26 +164,6 @@ const moveBall = function() {
     ball.position.x += speed * direction.x;
     ball.position.y += speed * direction.y;
 }
-
-// const ball_x = ball.position.x;
-// const player1_x = player1.position.x;
-// if ( ball_x > player1_x ) {
-//   if (Math.abs((ball_x - ballRadious) - (player1_x + playerHeight/2)) < 0.3 )
-//     reflect('y');
-// }
-// // to the right of the ball
-// else {
-//   if (Math.abs((ball_x + ballRadious) - (player1_x - playerHeight/2)) < 0.3 )
-//     reflect('y');
-// }
-// const reflect = function(vin, n) {
-//   const n2 = n.clone();
-//   n2.normalize();
-//   let ret = vin.clone();
-//   const f = 2 * n2.dot(vin);
-//   ret.sub(n2.multiplyScalar(f));
-//   return ret;
-// }
 
 // function to wait in order to hopefull improve the detection mechanism
 const sleep = function(ms) {
