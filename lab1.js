@@ -1,11 +1,9 @@
-// let singleMode = false;
-// let doubleMode = false;
-//
-// if(confirm('Do you want to play in DoubleMode?')){
-//   doubleMode = true;
-// } else{
-//   singleMode = true;
-// }
+let singleMode = false;
+let doubleMode = false;
+
+(confirm('Welcome to silly game .. Do you want to play in DoubleMode?')) ?
+  doubleMode = true : singleMode = true;
+
 
 // initilaize WebGLRenderer
 "use strict";
@@ -64,7 +62,6 @@ const cushionSMMat = new THREE.MeshBasicMaterial( {color: "#006400"} );
 const cushionSM = new THREE.Mesh( cushionSMGeo, cushionSMMat );
 cushionSM.rotation.z = -Math.PI/2;
 cushionSM.position.set(0,7.9,0.5);
-playgorund.add(cushionSM);
 
 
 const cushionDMGeo = new THREE.BoxGeometry( cushionWidth, 7.8, 1 );
@@ -89,7 +86,9 @@ const player2Mat = new THREE.MeshBasicMaterial( {color: "blue"} );
 const player2 = new THREE.Mesh( player2Geo, player2Mat );
 player2.rotation.z = -Math.PI/2;
 player2.position.set(0,7.9,0.5);
-// playgorund.add(player2);
+
+// if double mode activate
+(doubleMode) ? playgorund.add(player2): playgorund.add(cushionSM);
 
 // add the ball
 const ballGeo = new THREE.SphereGeometry(ballRadious, 16,16);
@@ -109,16 +108,22 @@ const movePlayerOne = function(event) {
   event.preventDefault();
   const leftKeystroke = 37;
   const rightKeystroke = 39;
-  if(event.keyCode === rightKeystroke) {
-    // edit
-    if(player1.position.x < (playGroundWidth -1) ){
-      player1.position.x += 0.5;
-    }
-  }
-  if(event.keyCode === leftKeystroke) {
-    if(player1.position.x > -(playGroundWidth -1) )
-      player1.position.x -= 0.5;
-    }
+  const aKeyStroke = 65;
+  const dKeyStroke = 68;
+  const editedPlayGroundWitdth = playGroundWidth -1;
+
+  (event.keyCode === rightKeystroke) ?
+    (player1.position.x < editedPlayGroundWitdth)  ? player1.position.x += 0.5 : null : null;
+
+  (event.keyCode === leftKeystroke) ?
+    (player1.position.x > -editedPlayGroundWitdth) ? player1.position.x -= 0.5 : null : null;
+
+  (event.keyCode === dKeyStroke) ?
+    (player2.position.x < editedPlayGroundWitdth)  ? player2.position.x += 0.5 : null : null;
+
+  (event.keyCode === aKeyStroke) ?
+    (player2.position.x > -editedPlayGroundWitdth) ? player2.position.x -= 0.5 : null : null;
+
 };
 
 let direction = {x: 2, y: 2, z: 0};
