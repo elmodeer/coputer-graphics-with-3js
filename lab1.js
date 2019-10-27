@@ -10,7 +10,6 @@ const renderer = new THREE.WebGLRenderer({canvas:canvas});
 renderer.setClearColor('white');   // set background color
 
 const scene = new THREE.Scene();
-// scene.add(new THREE.AxesHelper());
 const camera = new THREE.PerspectiveCamera( 75, canvas.width / canvas.height, 0.1, 1000 );
 camera.position.set(0,0,15);
 camera.lookAt(scene.position);   // camera looks at origin
@@ -18,16 +17,15 @@ const ambientLight = new THREE.AmbientLight("white");
 scene.add(ambientLight);
 
 // useful variables and constants
-var collidableMeshListP1 = [];
-var collidableMeshListP2 = [];
-
 const playGroundWidth = 8;
 const playGroundHeight = 16;
-// the distance between the ball radious and the cushion, which is basically the ball radious
+const playGroundDepth = 1;
 const ballRadious = 0.3;
 const cushionWidth = 0.2;
-cushionDepth = 0.5;
-
+const playerHeight = 1.5;
+const cushionDepth = 0.5;
+const widthAlignment = playGroundWidth/2 - cushionWidth/2;
+const heightAlignment = playGroundHeight/2 - cushionWidth/2;
 
 // 1- playgorund
 const playgorund = new THREE.Object3D();
@@ -45,57 +43,36 @@ lineGeo.vertices.push(new THREE.Vector3(playGroundWidth/2,0,0));
 const line = new THREE.Line(lineGeo, lineMat);
 playgorund.add(line);
 
-// 3- add the cushions
-// first cushion
-const cushion1Geo = new THREE.BoxGeometry( cushionWidth , playGroundHeight, 1 );
-const cushion1Mat = new THREE.MeshBasicMaterial( {color: "#006400"} );
-const cushion1 = new THREE.Mesh( cushion1Geo, cushion1Mat );
-cushion1.position.set(-(playGroundWidth/2 - cushionWidth/2), 0, cushionDepth);
-playgorund.add(cushion1);
+let Side = {
+    UP: 1,
+    DOWN: -1,
+    LEFT: -1,
+    RIGHT: 1
+};
+const Cushion = {
+    construct: function(width, height, depth) {
+      const cushionGeo = new THREE.BoxGeometry( width , height, depth);
+      const cushionMat = new THREE.MeshBasicMaterial( {color: "#006400"} );
+      const cushion = new THREE.Mesh( cushionGeo, cushionMat );
+      return cushion;
+    }
+}
 
-// second cushion
-const cushion2Geo = new THREE.BoxGeometry( cushionWidth, playGroundHeight, 1 );
-const cushion2Mat = new THREE.MeshBasicMaterial( {color: "#006400"} );
-const cushion2 = new THREE.Mesh( cushion2Geo, cushion2Mat );
-cushion2.position.set(playGroundWidth/2 - cushionWidth/2, 0, cushionDepth);
-playgorund.add(cushion2);
-
-// 4- cushion for singleMode
-const cushionSMGeo = new THREE.BoxGeometry( cushionWidth, playGroundWidth - cushionWidth, 1 );
-const cushionSMMat = new THREE.MeshBasicMaterial( {color: "#006400"} );
-const cushionSM = new THREE.Mesh( cushionSMGeo, cushionSMMat );
-cushionSM.rotation.z = -Math.PI/2;
-cushionSM.position.set(0, playGroundHeight/2 - cushionWidth/2, cushionDepth);
-playgorund.add(cushionSM);
-
-
-const cushionDMGeo = new THREE.BoxGeometry( cushionWidth, playGroundWidth - cushionWidth, 1 );
-const cushionDMMat = new THREE.MeshBasicMaterial( {color: "#006400"} );
-const cushionDM = new THREE.Mesh( cushionDMGeo, cushionDMMat );
-cushionDM.rotation.z = -Math.PI/2;
-cushionDM.position.set(0,-(playGroundHeight/2 - cushionWidth/2), cushionDepth);
-
-// 5- box for player 1
-const playerHeight = 1.5;
-const player1Geo = new THREE.BoxGeometry( cushionWidth, playerHeight, 1 );
-const player1Mat = new THREE.MeshBasicMaterial( {color: "red"} );
-const player1 = new THREE.Mesh( player1Geo, player1Mat );
-player1.rotation.z = -Math.PI/2;
-player1.position.set(0,-(playGroundHeight/2 - cushionWidth/2), cushionDepth);
-playgorund.add(player1);
-
-// 6- add player 2
-const player2Geo = new THREE.BoxGeometry( cushionWidth, playerHeight, 1 );
-const player2Mat = new THREE.MeshBasicMaterial( {color: "blue"} );
-const player2 = new THREE.Mesh( player2Geo, player2Mat );
-player2.rotation.z = -Math.PI/2;
-player2.position.set(0,(playGroundHeight/2 - cushionWidth/2), cushionDepth);
-
+const Player = {
+    construct: function(color, side) {
+      const player1Geo = new THREE.BoxGeometry( cushionWidth, playerHeight, 1 );
+      const player1Mat = new THREE.MeshBasicMaterial( {color: color} );
+      const player = new THREE.Mesh( player1Geo, player1Mat );
+      player.rotation.z = -Math.PI/2;
+      player.position.set(0, side * (playGroundHeight/2 - cushionWidth/2), cushionDepth);
+      return player;
+    }
+}
 
 // add the ball
 const Ball = {
-    construct : function() {
-      const ballGeo = new THREE.SphereGeometry(ballRadious, 16,16);
+    construct : function(r) {
+      const ballGeo = new THREE.SphereGeometry(r, 16,16);
       const ballMat = new THREE.MeshBasicMaterial({color: "yellow",
                                                    wireframe:false} );
       const ballObj = new THREE.Mesh(ballGeo, ballMat);
@@ -107,8 +84,26 @@ const Ball = {
       ball.position.y += speed * direction.y;
     }
 }
-ball = Ball.construct();
+const ball = Ball.construct(ballRadious);
+const player1 = Player.construct("red", Side.DOWN);
+const player2 = Player.construct("blue",Side.UP);
+const cushion1 = Cushion.construct(cushionWidth, playGroundHeight, playGroundDepth);
+const cushion2 = Cushion.construct(cushionWidth, playGroundHeight, playGroundDepth);
+const cushionSM = Cushion.construct( cushionWidth, playGroundWidth - cushionWidth, playGroundDepth);
+const cushionDM = Cushion.construct( cushionWidth, playGroundWidth - cushionWidth, playGroundDepth);
 
+cushion1.position.set(Side.LEFT * widthAlignment, 0, cushionDepth);
+cushion2.position.set(Side.RIGHT * widthAlignment, 0, cushionDepth);
+cushionSM.position.set(0, Side.UP * heightAlignment, cushionDepth);
+cushionSM.rotation.z = -Math.PI/2;
+// cushionDM.position.set(0,Side.LEFT * heightAlignment, cushionDepth);
+// cushionDM.rotation.z = -Math.PI/2;
+
+// playgorund components
+playgorund.add(cushion1);
+playgorund.add(cushion2);
+playgorund.add(cushionSM);
+playgorund.add(player1)
 // scene components
 scene.add(playgorund);
 scene.add(ball);
@@ -159,13 +154,6 @@ const detectCollision  = function() {
       direction = reflect('x');
   }
 }
-
-
-collidableMeshListP2.push(player2);
-collidableMeshListP2.push(ball)
-collidableMeshListP1.push(player1);
-collidableMeshListP1.push(ball);
-
 
 const refelctPlayer = function(player) {
   const hittingThreshold = playerHeight/2 + ballRadious;
