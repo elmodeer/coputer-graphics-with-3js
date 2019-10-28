@@ -5,14 +5,23 @@ let gameOver = false;
 
 // initilaize WebGLRenderer
 "use strict";
-const canvas = document.getElementById("mycanvas");
-const renderer = new THREE.WebGLRenderer({canvas:canvas});
-renderer.setClearColor('white');   // set background color
+const firstcanvas = document.getElementById("firstcanvas");
+const secondCanvas = document.getElementById("secondCanvas");
+const firstRenderer = new THREE.WebGLRenderer({canvas:firstcanvas});
+const secondRenderer = new THREE.WebGLRenderer({canvas:secondCanvas});
+
+firstRenderer.setClearColor('white');   // set background color
+secondRenderer.setClearColor('white');   // set background color
 
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera( 75, canvas.width / canvas.height, 0.1, 1000 );
-camera.position.set(0,0,15);
-camera.lookAt(scene.position);   // camera looks at origin
+const firstCamera = new THREE.PerspectiveCamera( 75, firstcanvas.width / firstcanvas.height, 0.1, 1000 );
+const secondCamera = new THREE.PerspectiveCamera( 75, secondCanvas.width / secondCanvas.height, 0.1, 1000 );
+
+firstCamera.position.set(0,-12,10);
+
+secondCamera.position.set(0,12,10);
+
+secondCamera.up = new THREE.Vector3(0, 0, 1);
 const ambientLight = new THREE.AmbientLight("white");
 scene.add(ambientLight);
 
@@ -35,12 +44,14 @@ const plane = new THREE.Mesh( planeGeo, planeMat );
 playgorund.add(plane);
 
 // 2- line in the middle
-const lineMat = new THREE.LineBasicMaterial( { color: "white" } );
+// line width doen not work in chrome !!! 
+const lineMat = new THREE.LineBasicMaterial( { color: "white", linewidth: 5} );
 const lineGeo = new THREE.Geometry();
 lineGeo.vertices.push(new THREE.Vector3(-playGroundWidth/2,0,0));
 lineGeo.vertices.push(new THREE.Vector3(0,0,0));
 lineGeo.vertices.push(new THREE.Vector3(playGroundWidth/2,0,0));
 const line = new THREE.Line(lineGeo, lineMat);
+line.scale.set( 1, 1, 1 );
 playgorund.add(line);
 
 let Side = {
@@ -114,6 +125,10 @@ let speed = 0.06;
 // functions
 // movement part
 const movePlayerOne = function(event) {
+  console.log(secondCamera.position);
+  console.log(secondCamera.rotation);
+
+  console.log(firstCamera.position);
   event.preventDefault();
   const leftKeystroke = 37;
   const rightKeystroke = 39;
@@ -129,11 +144,11 @@ const movePlayerOne = function(event) {
     (player1.position.x > -editedPlayGroundWitdth) ?
      player1.position.x -= movementStep : null : null;
 
-  (event.keyCode === dKeyStroke) ?
+  (event.keyCode === aKeyStroke) ?
     (player2.position.x < editedPlayGroundWitdth)  ?
      player2.position.x += movementStep : null : null;
 
-  (event.keyCode === aKeyStroke) ?
+  (event.keyCode === dKeyStroke) ?
     (player2.position.x > -editedPlayGroundWitdth) ?
      player2.position.x -= movementStep : null : null;
 
@@ -197,16 +212,23 @@ const doubleModeActiviate = function() {
     playgorund.add(player2);
     playgorund.remove(cushionSM);
 }
-
+function degInRad(deg) {
+    return deg * Math.PI / 180;
+}
 document.addEventListener('keydown', movePlayerOne);
-const controls = new THREE.TrackballControls( camera, canvas );
+const fcontrols = new THREE.TrackballControls( firstCamera, firstcanvas );
+const scontrols = new THREE.TrackballControls( secondCamera, secondCanvas );
+
 const clock = new THREE.Clock();
 function render() {
   requestAnimationFrame(render);
   detectCollision();
   if (!gameOver)
-    Ball.move();
-  controls.update();
-  renderer.render(scene, camera);
+     Ball.move();
+  fcontrols.update();
+  scontrols.update();
+  firstRenderer.render(scene, firstCamera);
+  secondRenderer.render(scene, secondCamera);
+
 }
 render();
