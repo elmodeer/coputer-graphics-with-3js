@@ -7,6 +7,7 @@ let gameOver = false;
 "use strict";
 const firstcanvas = document.getElementById("firstcanvas");
 const secondCanvas = document.getElementById("secondCanvas");
+secondCanvas.style.display = "none";
 const firstRenderer = new THREE.WebGLRenderer({canvas:firstcanvas});
 const secondRenderer = new THREE.WebGLRenderer({canvas:secondCanvas});
 
@@ -18,10 +19,9 @@ const firstCamera = new THREE.PerspectiveCamera( 75, firstcanvas.width / firstca
 const secondCamera = new THREE.PerspectiveCamera( 75, secondCanvas.width / secondCanvas.height, 0.1, 1000 );
 
 firstCamera.position.set(0,-12,10);
-
 secondCamera.position.set(0,12,10);
-
 secondCamera.up = new THREE.Vector3(0, 0, 1);
+
 const ambientLight = new THREE.AmbientLight("white");
 scene.add(ambientLight);
 
@@ -44,7 +44,7 @@ const plane = new THREE.Mesh( planeGeo, planeMat );
 playgorund.add(plane);
 
 // 2- line in the middle
-// line width doen not work in chrome !!! 
+// line width doen not work in chrome !!!
 const lineMat = new THREE.LineBasicMaterial( { color: "white", linewidth: 5} );
 const lineGeo = new THREE.Geometry();
 lineGeo.vertices.push(new THREE.Vector3(-playGroundWidth/2,0,0));
@@ -202,6 +202,7 @@ const reload = function(){
 const singleModeActiviate = function() {
     singleMode = true;
     doubleMode = false;
+    secondCanvas.style.display = "none";
     playgorund.add(cushionSM);
     playgorund.remove(player2);
 }
@@ -209,6 +210,7 @@ const singleModeActiviate = function() {
 const doubleModeActiviate = function() {
     doubleMode = true;
     singleMode = false;
+    secondCanvas.style.display = "block";
     playgorund.add(player2);
     playgorund.remove(cushionSM);
 }
