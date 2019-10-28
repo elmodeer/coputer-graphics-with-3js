@@ -5,7 +5,9 @@ let gameOver = false;
 
 // initilaize WebGLRenderer
 "use strict";
-const canvas = document.getElementById("mycanvas");
+const canvas = document.getElementById("firstcanvas");
+const secondCanvase = document.getElementById("secondCanvas");
+// document.getElementById("secondCanvas").style.display = "none";
 const renderer = new THREE.WebGLRenderer({canvas:canvas});
 renderer.setClearColor('white');   // set background color
 
@@ -58,6 +60,7 @@ const Cushion = {
     }
 }
 
+let speedR = 0;
 const Player = {
     construct: function(color, side) {
       const player1Geo = new THREE.BoxGeometry( cushionWidth, playerHeight, 1 );
@@ -66,16 +69,25 @@ const Player = {
       player.rotation.z = -Math.PI/2;
       player.position.set(0, side * (playGroundHeight/2 - cushionWidth/2), cushionDepth);
       return player;
+    },
+    move: function(player) {
+      const step = 0.2;
+      player.position.x += (speedR * step) ;
     }
 }
 
 // add the ball
+let num = Math.floor(Math.random() * 3) + 1;
+const x_component = num *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
+const y_component = num *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
+let direction = {x: x_component, y: y_component, z: 0};
 const Ball = {
     construct : function(r) {
       const ballGeo = new THREE.SphereGeometry(r, 16,16);
       const ballMat = new THREE.MeshBasicMaterial({color: "yellow",
                                                    wireframe:false} );
       const ballObj = new THREE.Mesh(ballGeo, ballMat);
+      // lift the ball up to be on the playground
       ballObj.position.z = ballRadious;
       return ballObj;
     },
@@ -87,71 +99,64 @@ const Ball = {
 const ball = Ball.construct(ballRadious);
 const player1 = Player.construct("red", Side.DOWN);
 const player2 = Player.construct("blue",Side.UP);
-const cushion1 = Cushion.construct(cushionWidth, playGroundHeight, playGroundDepth);
-const cushion2 = Cushion.construct(cushionWidth, playGroundHeight, playGroundDepth);
+const cushionLeft = Cushion.construct(cushionWidth, playGroundHeight, playGroundDepth);
+const cushionRight = Cushion.construct(cushionWidth, playGroundHeight, playGroundDepth);
 const cushionSM = Cushion.construct( cushionWidth, playGroundWidth - cushionWidth, playGroundDepth);
 const cushionDM = Cushion.construct( cushionWidth, playGroundWidth - cushionWidth, playGroundDepth);
 
-cushion1.position.set(Side.LEFT * widthAlignment, 0, cushionDepth);
-cushion2.position.set(Side.RIGHT * widthAlignment, 0, cushionDepth);
+cushionLeft.position.set(Side.LEFT * widthAlignment, 0, cushionDepth);
+cushionRight.position.set(Side.RIGHT * widthAlignment, 0, cushionDepth);
 cushionSM.position.set(0, Side.UP * heightAlignment, cushionDepth);
 cushionSM.rotation.z = -Math.PI/2;
-// cushionDM.position.set(0,Side.LEFT * heightAlignment, cushionDepth);
-// cushionDM.rotation.z = -Math.PI/2;
 
 // playgorund components
-playgorund.add(cushion1);
-playgorund.add(cushion2);
+playgorund.add(cushionLeft);
+playgorund.add(cushionRight);
 playgorund.add(cushionSM);
 playgorund.add(player1)
 // scene components
+const secondPlaygroung = playgorund.clone();
 scene.add(playgorund);
 scene.add(ball);
 let speed = 0.06;
 
 
-
 // functions
 // movement part
-const movePlayerOne = function(event) {
-  event.preventDefault();
-  const leftKeystroke = 37;
-  const rightKeystroke = 39;
-  const aKeyStroke = 65;
-  const dKeyStroke = 68;
-  const editedPlayGroundWitdth = playGroundWidth/2 -1;
-  const movementStep = 0.5;
-  (event.keyCode === rightKeystroke) ?
-    (player1.position.x < editedPlayGroundWitdth)  ?
-     player1.position.x += movementStep : null : null;
+const movePlayer = function(event) {
+  if (!gameOver) {
+    event.preventDefault();
+    const leftKeystroke = 37;
+    const rightKeystroke = 39;
+    const aKeyStroke = 65;
+    const dKeyStroke = 68;
+    const playGroundEnd = playGroundWidth/2 -1;
+    if (event.keyCode === rightKeystroke)
+      if (player1.position.x < playGroundEnd)
+        speedR = Side.RIGHT * 0.5;
 
-  (event.keyCode === leftKeystroke) ?
-    (player1.position.x > -editedPlayGroundWitdth) ?
-     player1.position.x -= movementStep : null : null;
+    if (event.keyCode === leftKeystroke)
+      if (player1.position.x > -playGroundEnd)
+        speedR = Side.LEFT * 0.5;
 
-  (event.keyCode === dKeyStroke) ?
-    (player2.position.x < editedPlayGroundWitdth)  ?
-     player2.position.x += movementStep : null : null;
+    if (event.keyCode === dKeyStroke)
+      if (player2.position.x < playGroundEnd)
+        speedR = Side.RIGHT * 0.5;
 
-  (event.keyCode === aKeyStroke) ?
-    (player2.position.x > -editedPlayGroundWitdth) ?
-     player2.position.x -= movementStep : null : null;
+    if (event.keyCode === aKeyStroke)
+      if (player2.position.x > -playGroundEnd)
+        speedR = Side.LEFT * 0.5;
 
-};
+  }
+}
 
-
-
-let num = Math.floor(Math.random() * 3) + 1;
-const x_component = num *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
-const y_component = num *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
-let direction = {x: x_component, y: y_component, z: 0};
 const detectCollision  = function() {
   if ((playGroundHeight/2 - ball.position.y ) < ballRadious) {
       (doubleMode) ?  refelctPlayer(player2) : reflect('y');
   } else if((playGroundHeight/2 + ball.position.y ) < ballRadious  ) {
       refelctPlayer(player1)
   } else if((playGroundWidth/2 - Math.abs(ball.position.x)) < ballRadious) {
-      direction = reflect('x');
+      reflect('x');
   }
 }
 
@@ -178,8 +183,6 @@ const refelctPlayer = function(player) {
 const reflect = function(side) {
   (side === 'x') ? direction.x = -1 * direction.x :
                    direction.y = -1 * direction.y;
-  return direction;
-
 }
 const reload = function(){
   location.reload();
@@ -198,12 +201,19 @@ const doubleModeActiviate = function() {
     playgorund.remove(cushionSM);
 }
 
-document.addEventListener('keydown', movePlayerOne);
+document.addEventListener('keydown', movePlayer);
+document.addEventListener('keyup', function() { speedR = 0} );
 const controls = new THREE.TrackballControls( camera, canvas );
 const clock = new THREE.Clock();
 function render() {
   requestAnimationFrame(render);
   detectCollision();
+  // Player.move(player1,0.05, Side.LEFT);
+  Player.move(player1, Side.RIGHT);
+  Player.move(player1, Side.LEFT);
+  Player.move(player2, Side.RIGHT);
+  Player.move(player2, Side.LEFT);
+
   if (!gameOver)
     Ball.move();
   controls.update();

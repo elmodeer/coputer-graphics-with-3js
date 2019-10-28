@@ -10,8 +10,12 @@
            color: blue;
            font-size: large;
          }
-         #mycanvas {
+         #firstcanvas {
            border: 1px solid;
+         }
+         #secondCanvas {
+           border: 1px solid;
+           opacity: 0;
          }
          #double {
            padding-left: 900px;
@@ -20,7 +24,7 @@
            background-color: #4CAF50;
            border: none;
            color: white;
-           padding: 15px 32px;
+           padding: 10px 10px;
            text-align: center;
            text-decoration: none;
            display: inline-block;
@@ -54,15 +58,18 @@
         </style>
     </head>
     <body>
-        <p>Here is some text.</p>
-        <div >
-          <div id="winingDiv" style="float: right; padding: 50px;">
-          </div>
-          <canvas id="mycanvas"
+        <!-- <div id="winingDiv" style="float: right; padding: 50px;"> -->
+        <div id="winingDiv">
+          welome to Lab 1 game
+        </div>
+        <!-- <div> -->
+          <canvas id="firstcanvas"
                   width="800" height="600">
           </canvas>
-        </div>
-        <div></div>
+          <!-- <canvas id="secondCanvas"
+                  width="800" height="600">
+          </canvas> -->
+        <!-- </div> -->
         <button class="button button5" onclick="reload()">reload</button>
         <button class="button button1" onclick="singleModeActiviate()">single mode</button>
         <button class="button button3" onclick="doubleModeActiviate()">double mode</button>
