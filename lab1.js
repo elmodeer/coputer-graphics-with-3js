@@ -140,7 +140,7 @@ cushionSM.rotation.z = -Math.PI/2;
 playgorund.add(cushion1);
 playgorund.add(cushion2);
 playgorund.add(cushionSM);
-playgorund.add(player1)
+playgorund.add(player1);
 // scene components
 scene.add(playgorund);
 scene.add(ball);
