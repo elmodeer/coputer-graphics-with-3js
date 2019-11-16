@@ -29,7 +29,7 @@ for ( let i = 0; i < 20; i ++ ) {
   points.push( new THREE.Vector2( Math.sin( i * 0.16 ) + 4.8, ( i - 10 ) * 0.05) );
 }
 const geometry = new THREE.LatheGeometry(points);
-const material = new THREE.MeshBasicMaterial({color: 'lightblue'});
+const material = new THREE.MeshBasicMaterial({color: 'yellow'});
 const lathe = new THREE.Mesh(geometry, material);
 clock.add(lathe);
 
@@ -194,9 +194,13 @@ function render() {
 	// minutesHand.rotation.z = -handMinuteR;
   // why
 	moveHand(secondsHand, handSecondR);
-  // moveHand(secondsHand2, - handSecondR);
+  moveHand(secondsHand2, - handSecondR);
+
   moveHand(minutesHand, handMinuteR);
+  moveHand(minutesHand2, - handMinuteR);
+
   moveHand(hoursHand, handHourR + relativeHourR);
+  moveHand(hoursHand2, -(handHourR + relativeHourR));
 
   // secondsHand.position.z = -handSecondR;
 
