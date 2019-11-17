@@ -197,10 +197,10 @@ const reflect = function(side) {
   return direction;
 
 }
-const reload = function(){
+function reload() {
   location.reload();
 }
-const singleModeActiviate = function() {
+function singleModeActiviate() {
   if (!gameOver) {
     singleMode = true;
     doubleMode = false;
@@ -210,7 +210,7 @@ const singleModeActiviate = function() {
   }
 }
 
-const doubleModeActiviate = function() {
+function doubleModeActiviate() {
   if (!gameOver) {
     doubleMode = true;
     singleMode = false;
@@ -221,7 +221,7 @@ const doubleModeActiviate = function() {
 }
 
 document.addEventListener('keydown', movePlayer);
-document.addEventListener("keyup", (event) => {
+document.addEventListener("keyup", () => {
     Player.speed = 0;
 });
 const fcontrols = new THREE.TrackballControls( firstCamera, firstcanvas );
