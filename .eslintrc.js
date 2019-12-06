@@ -4,7 +4,7 @@ module.exports = {
     "ecmaVersion": 8
   },
   "rules": {
-    "no-magic-numbers": "warn",
+    // "no-magic-numbers": "warn",
     "semi": ["warn", "always"],
     "no-constant-condition": ["error", { "checkLoops": false }],
     "no-console": "error",
