@@ -4,9 +4,9 @@
  * @param {*} balls list of balls for which the random speeds will be created.
  */
 function randomSpeeds(balls) {
-  let randomSpeeds = {};
+  const randomSpeeds = {};
   balls.forEach(ball => {
-    randomSpeeds[ball.name] = new THREE.Vector3(2*Math.random() - 1, 0, 2 * Math.random() - 1);
+    randomSpeeds[ball.name] = new THREE.Vector3(2*Math.random() - 1, 0, 2*Math.random() - 1);
   });
   return randomSpeeds;
 }
@@ -28,27 +28,30 @@ function checkCusionReflection(balls, speeds) {
   });
 }
 
-function move(spheres, deltaTime, t, speeds, radius, tableEdges){
+function move(spheres, dt, t, speeds, radius, tableEdges){
+  checkCusionReflection(spheres, speeds)
 
 // let them roll
   spheres.forEach((ball) => {
-    getBallSpeed(ball, spheres, radius, speeds, deltaTime);
-    checkCusionReflection(spheres, speeds)
+    updateSpeed(ball, spheres, radius, speeds, dt);
 
+    let ax = new THREE.Vector3(0,1,0).cross(speeds[ball.name]).normalize();
     const speed = speeds[ball.name];
     const omega = speed.length() / radius;
-    let rotationAxis = speed.clone().cross(new THREE.Vector3(0,1,0));
-    rotationAxis.multiplyScalar(-1);
-    rotationAxis.normalize();
-    ball.matrix.makeRotationAxis( rotationAxis, omega*t);
+    // dR: incremental rotation matrix that performs the rotation of the current time step.
+    const dR = new THREE.Matrix4();
+    dR.makeRotationAxis(ax, omega*dt);
+     // multiply with dR form the left (matrix.multiply multiplies from the right!)
+    ball.matrix.premultiply(dR);
+     // set translational part of matrix to current position:
     const currentPosition = ball.position;
-    currentPosition.add(speed.clone().multiplyScalar(deltaTime));
+    currentPosition.add(speed.clone().multiplyScalar(dt));
     ball.matrix.setPosition(currentPosition);
   });
 }
 
 
-function getBallSpeed(currentBall, balls, radius, speeds, dt){
+function updateSpeed(currentBall, balls, radius, speeds, dt){
   const dist = currentBall.position.clone();
   const distancesSqDict = {};
   // remove the current ball as not to compare with itself
@@ -78,9 +81,3 @@ function getBallSpeed(currentBall, balls, radius, speeds, dt){
     }
   }
 }
-
-// function updateBallPostions(balls, speeds, dt) {
-//     balls.forEach(b => {
-//       b.position.add(speeds[b.name].clone().multiplyScalar(dt));
-//     });
-// }
