@@ -2,7 +2,7 @@
  * draws the billiard table.
  * @param {Object} scene THREE.Scene();
  */
- function createTable(scene) {
+ function createTable(scene, tableLength, tableWidth) {
    const Box = {
      construct: function(width, height, depth, color) {
        const boxGeo = new THREE.BoxGeometry(width, height, depth);
@@ -38,31 +38,31 @@
    scene.add(leg4);
 
    // table bed
-   const bed = Box.construct(3, 0.01, 6, 'green');
+   const bed = Box.construct(tableWidth, 0.01, tableLength, 'green');
    bed.position.y = 1;
    scene.add(bed);
    // add cussions
    // 1st cussion parallel to the z axiz
-   const cussionX1 = Box.construct(0.2, 0.2, 6, 'green');
+   const cussionX1 = Box.construct(0.2, 0.2, tableLength, 'green');
    cussionX1.position.y = 1.1;
    cussionX1.position.x = -1.4;
    scene.add(cussionX1);
 
    // 2nd cussion parallel to the z axis
-   const cussionX2 = Box.construct(0.2, 0.2, 6, 'green');
+   const cussionX2 = Box.construct(0.2, 0.2, tableLength, 'green');
    cussionX2.position.y = 1.1;
    cussionX2.position.x = 1.4;
    scene.add(cussionX2);
    // 1st cussion parallel to the x axis
 
-   const cussionZ1 = Box.construct(3, 0.2, 0.2, 'green');
+   const cussionZ1 = Box.construct(tableWidth, 0.2, 0.2, 'green');
    cussionZ1.position.y = 1.1;
-   cussionZ1.position.z = 2.9;
+   cussionZ1.position.z = tableWidth - 0.1;
    scene.add(cussionZ1);
 
    // 2nd cussion parallel to the x axis
-   const cussionZ2 =  Box.construct(3, 0.2, 0.2, 'green');
+   const cussionZ2 =  Box.construct(tableWidth, 0.2, 0.2, 'green');
    cussionZ2.position.y = 1.1;
-   cussionZ2.position.z = -2.9;
+   cussionZ2.position.z = -(tableWidth - 0.1);
    scene.add(cussionZ2);
  }

@@ -3,6 +3,7 @@
  * generates a random list of speed vectors in (x,y).
  * @param {*} balls list of balls for which the random speeds will be created.
  */
+radius = 0.1
 function randomSpeeds(balls) {
   const randomSpeeds = {};
   balls.forEach(ball => {
@@ -12,28 +13,30 @@ function randomSpeeds(balls) {
 }
 
 
-function checkCusionReflection(balls, speeds) {
+function checkCusionReflection(balls, speeds, tableLength, tableWidth) {
   balls.forEach( b => {
-    if(b.position.x > 1.2)
+    const tolerance = 0.3;
+    if(b.position.x > (tableWidth/2 - tolerance))
       speeds[b.name].x = - Math.abs(speeds[b.name].x);
-    if(b.position.x < -1.2)
+    if(b.position.x < -(tableWidth/2 - tolerance))
       speeds[b.name].x = Math.abs(speeds[b.name].x);
 
-    if(b.position.z > 2.7)
+    if(b.position.z > (tableLength/2 - tolerance))
       speeds[b.name].z = - Math.abs(speeds[b.name].z);
-    if(b.position.z < -2.7)
+    if(b.position.z < -(tableLength/2 - tolerance))
       speeds[b.name].z = Math.abs(speeds[b.name].z);
 
+    // speeds[b.name].multiplyScalar(0.2);
 
   });
 }
 
-function move(spheres, dt, t, speeds, radius, tableEdges){
-  checkCusionReflection(spheres, speeds)
+function move(spheres, dt, speeds, tableLength, tableWidth){
+  checkCusionReflection(spheres, speeds, tableLength, tableWidth)
 
 // let them roll
   spheres.forEach((ball) => {
-    updateSpeed(ball, spheres, radius, speeds, dt);
+    updateSpeed(ball, spheres, speeds, dt);
 
     let ax = new THREE.Vector3(0,1,0).cross(speeds[ball.name]).normalize();
     const speed = speeds[ball.name];
@@ -51,10 +54,10 @@ function move(spheres, dt, t, speeds, radius, tableEdges){
 }
 
 
-function updateSpeed(currentBall, balls, radius, speeds, dt){
+function updateSpeed(currentBall, balls, speeds, dt){
   const dist = currentBall.position.clone();
   const distancesSqDict = {};
-  // remove the current ball as not to compare with itself
+  // remove the current ball as not to compare it with itself
   ballsCopy = [...balls];
   ballsCopy.splice(balls.indexOf(currentBall), 1);
   ballsCopy.forEach( ball => {

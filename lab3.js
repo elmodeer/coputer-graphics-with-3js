@@ -67,8 +67,9 @@ const ceiling = ground.clone();
 ceiling.position.y = 8;
 scene.add(ceiling);
 // draw table
-createTable(scene);
-const tableEdges = {up:1.3, down: -1.3, right: 2.6, left: -2.5};
+const tableWidth = 3;
+const tableLength = 6;
+createTable(scene, tableLength, tableWidth);
 //ball radius
 const radius = 0.1;
 const balls = createBalls(scene,radius);
@@ -77,16 +78,11 @@ const speeds = randomSpeeds(balls);
 
 
 const clock = new THREE.Clock();
-let check_time;
-
 function render() {
   requestAnimationFrame(render);
   controls.update();
   renderer.render(scene, camera);
   const dt = clock.getDelta();
-  check_time = dt;
-  const t = clock.getElapsedTime();
-  move(balls, dt, t, speeds, radius, tableEdges);
-
+  move(balls, dt, speeds, tableLength, tableWidth);
 }
 render();

@@ -3,7 +3,7 @@ function createBalls(scene, radius){
   const ballFiles = ['Ball8.jpg', 'Ball9.jpg', 'Ball10.jpg', 'Ball11.jpg', 'Ball12.jpg', 'Ball13.jpg', 'Ball14.jpg', 'Ball15.jpg'];
   // const ballFiles = ['Ball8.jpg', 'Ball9.jpg', 'Ball10.jpg'];
 
-  const randomInitialPositionsList = randomPositions();
+  const randomInitialPositionsList = randomPositions(radius);
   const filePath = "http://localhost:8000/balls/";
 
   ballFiles.forEach((fileName, index) => {
@@ -29,7 +29,7 @@ function createBalls(scene, radius){
 // get random number between 3 and 1
 
 
-function randomPositions(){
+function randomPositions(radius){
   const randomPositions = [];
 
   while(randomPositions.length < 8){
@@ -41,5 +41,6 @@ function randomPositions(){
     const z_component = numZ *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
     randomPositions.push({x:x_component, z:z_component});
   }
+
   return randomPositions;
 }
