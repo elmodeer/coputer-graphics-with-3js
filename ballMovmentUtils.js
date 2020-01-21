@@ -12,21 +12,32 @@ function randomSpeeds(balls) {
   return randomSpeeds;
 }
 
+function reload() {
+  location.reload();
+}
 
 function checkCusionReflection(balls, speeds, tableLength, tableWidth) {
   balls.forEach( b => {
     const tolerance = 0.3;
-    if(b.position.x > (tableWidth/2 - tolerance))
-      speeds[b.name].x = - Math.abs(speeds[b.name].x);
-    if(b.position.x < -(tableWidth/2 - tolerance))
+    if(b.position.x > (tableWidth/2 - tolerance)) {
+      speeds[b.name].x = -Math.abs(speeds[b.name].x);
+      speeds[b.name].multiplyScalar(0.8);
+    }
+    if(b.position.x < -(tableWidth/2 - tolerance)) {
       speeds[b.name].x = Math.abs(speeds[b.name].x);
+      speeds[b.name].multiplyScalar(0.8);
+    }
 
-    if(b.position.z > (tableLength/2 - tolerance))
-      speeds[b.name].z = - Math.abs(speeds[b.name].z);
-    if(b.position.z < -(tableLength/2 - tolerance))
+    if(b.position.z > (tableLength/2 - tolerance)) {
+      speeds[b.name].z = -Math.abs(speeds[b.name].z);
+      speeds[b.name].multiplyScalar(0.8);
+    }
+    if(b.position.z < -(tableLength/2 - tolerance)) {
       speeds[b.name].z = Math.abs(speeds[b.name].z);
+      speeds[b.name].multiplyScalar(0.8);
+    }
 
-    // speeds[b.name].multiplyScalar(0.2);
+
 
   });
 }

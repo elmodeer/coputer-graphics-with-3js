@@ -143,7 +143,11 @@ function drawTicks() {
   const height = 0.5;
   for (let i=0; i< 60; i++) {
     const rotationAngle =  2 * i * Math.PI / 60;
-    if(i == 30 || i == 0 || i == 15 || i == 45 || (i%5 == 0)){
+    if (i == 0 ) {
+      // mark 12 o'clock point
+      drawTick(rotationAngle, 'black', heightTens + 0.3 , widthTens*2);
+    }
+    if(i == 30 || i == 15 || i == 45 || (i%5 == 0)){
       drawTick(rotationAngle, 'black', heightTens, widthTens);
     } else {
       drawTick(rotationAngle, 'red', height, width);
